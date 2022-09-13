@@ -1,17 +1,24 @@
-FROM node:16.0.0
+# Stage 1: build frontend
+FROM node:16.13.0 as frontend-builder
 
-COPY ./front /app/front
-WORKDIR /app/front
+COPY frontend /tmp/workspace
+WORKDIR /tmp/workspace
+RUN yarn install --frozen-lockfile && yarn build
 
-RUN npm install -g serve
-RUN npm install && npm build
-RUN serve -s build
+# Stage 2: build server
+FROM golang:1.17.3 as backend-builder
 
-FROM golang:1.17.3
+COPY server /tmp/workspace
+WORKDIR /tmp/workspace
+RUN CGO_ENABLED=0 go build -o go-react-boilerplate -trimpath .
 
-COPY ./server /app/server
-WORKDIR /app/server
+# Stage 3: final stage to be deployed
+FROM scratch
 
-RUN go mod download
-RUN go build -o main *.go
-RUN ./main
+COPY --from=frontend-builder /tmp/workspace/build/ /usr/local/share/go-react-boilerplate/
+COPY --from=backend-builder /tmp/workspace/go-react-boilerplate /usr/local/bin/go-react-boilerplate
+
+USER 10000:10000
+
+EXPOSE 8080
+ENTRYPOINT ["/usr/local/bin/go-react-boilerplate", "-http", ":8080", "-webroot", "/usr/local/share/go-react-boilerplate"]

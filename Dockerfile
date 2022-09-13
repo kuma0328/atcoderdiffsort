@@ -1,7 +1,7 @@
 # Stage 1: build frontend
 FROM node:16.13.0 as frontend-builder
 
-COPY frontend /tmp/workspace
+COPY front /tmp/workspace
 WORKDIR /tmp/workspace
 RUN yarn install --frozen-lockfile && yarn build
 

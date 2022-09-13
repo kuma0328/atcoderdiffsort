@@ -1,0 +1,47 @@
+version: '3'
+services:
+  front:
+    build:
+      context: .
+      dockerfile: ./docker/front/Dockerfile 
+    container_name: react-front
+    tty: true
+    volumes:
+      - ./front:/app/front
+    command: sh -c "cd /app/front && npm install && npm start"
+    ports:
+      - 3000:3000
+  server:
+    build:
+      context: .
+      dockerfile: ./docker/server/Dockerfile
+    container_name: go-server
+    ports:
+      - 8080:8080
+    tty: true
+    volumes:
+      - ./server:/app/server
+    command: sh -c "cd /app/server && go run *.go"
+    depends_on:
+      - db
+  db:
+    container_name: postgres-db
+    build: ./docker/db
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d
+      - ./db/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: pgadmin
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: atcoder_diff
+    restart: always
+  scraping:
+    container_name: python-scraping
+    build: ./docker/scraping
+    volumes:
+      - ./scraping:/app/scraping
+    command: sh -c "python3 main.py"
+    depends_on:
+      - db

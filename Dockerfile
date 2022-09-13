@@ -1,22 +1,23 @@
-FROM golang:latest AS builder
-ADD . /app
-WORKDIR /app/server
-RUN go mod download
-RUN go get -u github.com/pressly/goose/cmd/goose
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-w" -a -o /main .
+FROM node:16.13.0 as frontend-builder
 
-# build the React App
-FROM node:alpine AS node_builder
-COPY --from=builder /app/front .
-RUN npm install
-RUN npm run build
+COPY front /tmp/workspace
+WORKDIR /tmp/workspace
+RUN yarn install --frozen-lockfile && yarn build
 
-# copy the build assets to a minimal
-# alpine image
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-COPY --from=builder /main .
-COPY --from=node_builder /build ./web
-RUN chmod +x ./main
-EXPOSE 8080
-CMD ./main
+# Stage 2: build server
+FROM golang:1.17.3 as backend-builder
+
+COPY server /tmp/workspace
+WORKDIR /tmp/workspace
+RUN CGO_ENABLED=0 go build -o go-react-boilerplate -trimpath .
+
+# Stage 3: final stage to be deployed
+FROM scratch
+
+COPY --from=frontend-builder /tmp/workspace/build/ /usr/local/share/go-react-boilerplate/
+COPY --from=backend-builder /tmp/workspace/go-react-boilerplate /usr/local/bin/go-react-boilerplate
+
+USER 10000:10000
+
+EXPOSE 8000
+ENTRYPOINT ["/usr/local/bin/go-react-boilerplate", "-http", ":8000", "-webroot", "/usr/local/share/go-react-boilerplate"]

@@ -12,8 +12,6 @@ FROM golang:1.17.3
 COPY ./server /app/server
 WORKDIR /app/server
 
-RUN apk update
-RUN apk add git
 RUN go mod download
 RUN go build *.go
 RUN ./get_db_query

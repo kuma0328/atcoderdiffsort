@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef} from 'react'
 
 const GetOption = ({setPloblem}) => {
   const [tag, setTag] = useState("all")
@@ -31,10 +31,6 @@ const GetOption = ({setPloblem}) => {
       console.log(err)
     })
   };
-
-  useEffect(() => {
-    handleSubmit();
-  });
 
   const handleChange = (e) => {
     setTag(e.target.value);

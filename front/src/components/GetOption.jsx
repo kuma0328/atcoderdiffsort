@@ -21,7 +21,7 @@ const GetOption = ({setPloblem}) => {
     setErrMessage("")
     const userId = userIdRef.current.value
     console.log(userId)
-    const url = "/api/"
+    const url = "https://atcoderdiffsort-api.onrender.com/"
     axios.post(url, {tag:tag, minDiff:minDiff, maxDiff:maxDiff, userId:userId})
     .then((res) => {
       console.log(res)

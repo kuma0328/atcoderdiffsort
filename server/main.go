@@ -43,6 +43,6 @@ func main()  {
 	if port == "" {
 		port = "8080"
 	}
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/api/", handler)
 	http.ListenAndServe(":"+port,nil)
 }

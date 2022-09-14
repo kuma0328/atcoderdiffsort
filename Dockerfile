@@ -3,7 +3,7 @@ FROM node:16.13.0 as frontend-builder
 
 COPY front /tmp/workspace
 WORKDIR /tmp/workspace
-RUN npm install && npm run build
+RUN yarn install && yarn run build
 
 # Stage 2: build server
 FROM golang:1.17.3 as backend-builder

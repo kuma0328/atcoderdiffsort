@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	_ "github.com/lib/pq"
+	"os"
 
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 type Ploblem struct {
@@ -19,16 +21,13 @@ type Ploblem struct {
 
 
 func get_db_query(Tag string, MinDiff string, MaxDiff string, UserId string) []Ploblem{
-	data_url := "postgres://atcoderdiff_user:eiyUgBTmyMC6o4A3bGWsLScxH61ayIjp@dpg-ccg93i9gp3jt1rgbuaug-a/atcoderdiff"
-	// data_url := "postgres://atcoderdiff_user:eiyUgBTmyMC6o4A3bGWsLScxH61ayIjp@dpg-ccg93i9gp3jt1rgbuaug-a.oregon-postgres.render.com/atcoderdiff"
-	// data_url := fmt.Sprintf(
-	// 	"postgres://%s:%s@%s:%s/%s",
-	// 	"pgadmin",
-	// 	"postgres",
-	// 	"localhost",
-	// 	"5432",
-	// 	"atcoder_diff",
-	// )
+	err := godotenv.Load()
+	if err != nil {
+		panic("Error loading .env")
+	}
+
+	data_url := os.Getenv("PG_URL")
+	fmt.Println(data_url)
 
 	db, err := sql.Open("postgres", data_url)
 	if err != nil {

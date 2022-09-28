@@ -2,6 +2,7 @@ import requests
 import time
 import psycopg2
 import os
+from dotenv import load_dotenv
 
 def getPloblem():
   list = []
@@ -31,26 +32,21 @@ def getPloblem():
         list.append({'id':ploblem_id,'name':name,'tag':'agc','diff':diff,'url':url})
   return list
 
+load_dotenv()
+
 list = getPloblem()
-conn = psycopg2.connect("postgres://atcoderdiff_user:eiyUgBTmyMC6o4A3bGWsLScxH61ayIjp@dpg-ccg93i9gp3jt1rgbuaug-a.oregon-postgres.render.com/atcoderdiff")
-# conn =  psycopg2.connect('postgresql://{user}:{password}@{host}:{port}/{dbname}'.format(
-#   user="pgadmin",
-#   password="postgres",
-#   host="localhost",
-#   port=5432,
-#   dbname="atcoder_diff"
-# ))
+conn = psycopg2.connect(os.environ['PG_URL'])
 cur = conn.cursor()
 
 cur.execute('DROP TABLE IF EXISTS ploblem_table')
-cur.execute('CREATE TABLE ploblem_table (id varchar, name varchar, tag varchar, diff integer, url varchar);')
-
+cur.execute('CREATE TABLE ploblem_table (id varchar primary key, name varchar, tag varchar, diff integer, url varchar);')
 
 
 for data in list:
   s = "INSERT INTO ploblem_table (id, name, tag, diff, url) VALUES('{}','{}','{}',{},'{}')".format(
     data['id'], data['name'], data['tag'], data['diff'], data['url']
   )
+  print(s)
   cur.execute(s)
 
 conn.commit()

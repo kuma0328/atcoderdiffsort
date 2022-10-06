@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -21,10 +21,10 @@ type Ploblem struct {
 
 
 func get_db_query(Tag string, MinDiff string, MaxDiff string, UserId string) []Ploblem{
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env")
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	panic("Error loading .env")
+	// }
 
 	data_url := os.Getenv("PG_URL")
 	fmt.Println(data_url)
